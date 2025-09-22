@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const products = [
-        { id: 1, name: 'Jonkoso', price: 4000 },
-        { id: 2, name: 'Cashmir', price: 15000 },
-        { id: 3, name: 'Virgin Wool', price: 3500 },
-        { id: 4, name: 'Satin', price: 3000 },
-        { id: 5, name: 'Lace', price: 7500 },
+        { id: 1, name: 'Jonkoso 1 yard', price: 4000 },
+        { id: 2, name: 'Cashmir 1 yard', price: 15000 },
+        { id: 3, name: 'Virgin Wool 1 yard', price: 3500 },
+        { id: 4, name: 'Satin 1 yard', price: 3000 },
+        { id: 5, name: 'Lace 1 yard', price: 7500 },
     ];
 
     let cart = [];
@@ -272,4 +272,5 @@ document.addEventListener('DOMContentLoaded', () => {
     const scriptHtml2Canvas = document.createElement('script');
     scriptHtml2Canvas.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
     document.head.appendChild(scriptHtml2Canvas);
+
 });
