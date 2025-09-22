@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geladan Resources Invoice</title>
+    <link rel="stylesheet" href="style.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+    <div class="container">
+        <header class="dashboard-header">
+            <div class="logo">
+                <h1>GELADAN RESOURCES</h1>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="invoice-form-section">
+                <h2>Invoice Creator</h2>
+                <h5>Kindly fill the form below, select product, submit invoice and then generate invoice. </h5>
+                <h5>Download your invoice and upload it by clicking the upload invoice button, follow instruction as given</h5>
+                <h5>Also copy out and paste your ticket ID while uploading your invoice for easy tracking.</h5>
+                <h5>Upload your payment receipt as well when you make payment.</h5>
+                <form id="invoiceForm" class="invoice-form">
+                    <div class="form-group">
+                        <label for="invoiceHeader">Invoice Header</label>
+                        <input type="text" id="invoiceHeader" value="Geladan Resources Invoice" readonly>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="issueDate">Issue Date</label>
+                            <input type="date" id="issueDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dueDate">Due Date</label>
+                            <input type="date" id="dueDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sellerInfo">Seller Info</label>
+                        <textarea id="sellerInfo" readonly>Geladan Resources&#013;No.20 A line Ariaria, Aba, Nigeria&#013;09068420849&#013;geladan.com&#013;TIN: 584689-00001</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="buyerName">Buyer Name/Business</label>
+                        <input type="text" id="buyerName" placeholder="Customer's Name/Business Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyerAddress">Buyer Address</label>
+                        <input type="text" id="buyerAddress" placeholder="Customer's Address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyerContact">Buyer Contact</label>
+                        <input type="text" id="buyerContact" placeholder="Customer's Contact Details" required>
+                    </div>
+                </form>
+            </section>
+
+            <section class="cart-section">
+                <h2>Select Product</h2>
+                <div class="cart-items" id="cartItems">
+                    <!-- Products will be listed here by JavaScript -->
+                </div>
+                <button type="button" class="btn submit-cart-btn" id="submitCartBtn"><a href="https://forms.zohopublic.com/asolukacharles50gm1/form/INVOICE/formperma/zTUi8KcvRhLpJe0YjT82eGdOKs_0axT2s_M76Rj8RtQ">UPLOAD INVOICE</a></button>
+            </section>
+        </main>
+
+        <aside class="sidebar">
+            <div class="invoice-summary">
+                <h3>Invoice Summary</h3>
+                <div class="summary-item">
+                    <span>Subtotal:</span>
+                    <span id="subtotalAmount">₦0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Taxes (0%):</span>
+                    <span id="taxesAmount">₦0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Discount:</span>
+                    <span id="discountAmount">₦0.00</span>
+                </div>
+                <div class="summary-item total-amount">
+                    <span>TOTAL AMOUNT:</span>
+                    <span id="totalAmount">₦0.00</span>
+                </div>
+                <div class="summary-item total-goods">
+                    <span>TOTAL GOODS:</span>
+                    <span id="totalGoods">0</span>
+                </div>
+            </div>
+
+            <div class="bank-details">
+                <h3>Bank Account Details</h3>
+                <p><strong>BANK:</strong> UBA Bank</p>
+                <p><strong>ACCOUNT NAME:</strong> Uzoma Angela</p>
+                <p><strong>ACCOUNT NUMBER:</strong> 2090487949</p>
+                <p><strong>CURRENCY:</strong> ₦ NAIRA</p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn submit-invoice-btn" id="submitInvoiceBtn">SUBMIT INVOICE</button>
+                <button class="btn upload-evidence-btn"><a href="https://forms.zohopublic.com/asolukacharles50gm1/form/INVOICE/formperma/zTUi8KcvRhLpJe0YjT82eGdOKs_0axT2s_M76Rj8RtQ">UPLOAD RECEIPT OF PAYMENT</a></button>
+            </div>
+        </aside>
+
+        <footer class="dashboard-footer">
+            <div class="footer-info">
+                <p><strong>Office Address:</strong> No.20 A line Ariaria, Aba, Abia State</p>
+                <p><strong>Phone:</strong> 09068420849</p>
+                <p><strong>Payment Terms:</strong> Net 30 days</p>
+            </div>
+            <div class="terms-conditions">
+                <p>Refund policies as per agreement.</p>
+            </div>
+        </footer>
+    </div>
+    <div id="invoicePaperContainer" class="invoice-paper-container">
+        <!-- Generated invoice paper will be inserted here -->
+    </div>
+    <script src="script.js"></script> <!-- Link to your JavaScript file -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</body>
+</html>
