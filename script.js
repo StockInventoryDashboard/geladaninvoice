@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const invoiceForm = document.getElementById('invoiceForm');
-    const cartItemsDiv = document.getElementById('cartItems');
+    const issueDateInput = document.getElementById('issueDate');
+    const dueDateInput = document.getElementById('dueDate');
+    const cartItemsContainer = document.getElementById('cartItems');
     const submitInvoiceBtn = document.getElementById('submitInvoiceBtn');
     const invoicePaperContainer = document.getElementById('invoicePaperContainer');
     const subtotalAmountSpan = document.getElementById('subtotalAmount');
@@ -9,23 +11,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalAmountSpan = document.getElementById('totalAmount');
     const totalGoodsSpan = document.getElementById('totalGoods');
 
-    let products = [
-        { id: 1, name: "Fan (1 unit)", price: 10000 },
-        { id: 2, name: "OX fan (1 unit)", price: 15000 },
-        { id: 3, name: "Lantern (1 unit)", price: 20000 },
-        { id: 4, name: "Touch (1 unit)", price: 5000 },
-        { id: 5, name: "Battery (1 unit)", price: 15000 },
-        { id: 6, name: "Smart Watch (1 unit)", price: 35000 },
-        { id: 7, name: "Power Bank (1 unit)", price: 40000 },
-        { id: 8, name: "Extension Socket (1 unit)", price: 5000 },
-        { id: 9, name: "30mm Cable (1 unit)", price: 25000 },
-        { id: 10, name: "Cmos Battery (1 unit)", price: 5500 },
+    let cart = [];
+    const products = [
+        { id: 1, name: "Premium Web Hosting (1 Year)", price: 12000 },
+        { id: 2, name: "Domain Registration (.com, 1 Year)", price: 8000 },
+        { id: 3, name: "SSL Certificate (Basic)", price: 5000 },
+        { id: 4, name: "Website Design Package (Starter)", price: 75000 },
+        { id: 5, name: "E-commerce Integration", price: 50000 },
+        { id: 6, name: "SEO Optimization (Monthly)", price: 30000 },
+        { id: 7, name: "Social Media Management (Monthly)", price: 25000 },
+        { id: 8, name: "Content Creation (5 Articles)", price: 20000 },
+        { id: 9, name: "Custom Software Development (Per Hour)", price: 15000 },
+        { id: 10, name: "IT Support (On-demand)", price: 10000 },
+        { id: 11, name: "Cybersecurity Audit", price: 40000 },
+        { id: 12, name: "Cloud Storage (1TB, 1 Year)", price: 18000 },
+        { id: 13, name: "Graphic Design (Logo & Branding)", price: 35000 },
+        { id: 14, name: "Video Production (30-sec Ad)", price: 60000 },
+        { id: 15, name: "Mobile App Development (Basic)", price: 100000 },
     ];
 
-    let cart = [];
+    // Initialize dates
+    const today = new Date();
+    issueDateInput.value = today.toISOString().split('T')[0];
+    const thirtyDaysLater = new Date(today);
+    thirtyDaysLater.setDate(today.getDate() + 30);
+    dueDateInput.value = thirtyDaysLater.toISOString().split('T')[0];
 
+    // Render products
     function renderProducts() {
-        cartItemsDiv.innerHTML = '';
+        cartItemsContainer.innerHTML = '';
         products.forEach(product => {
             const productDiv = document.createElement('div');
             productDiv.classList.add('cart-item');
@@ -33,8 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span>${product.name} - ₦${product.price.toLocaleString()}</span>
                 <input type="number" min="0" value="0" data-product-id="${product.id}" class="product-quantity">
             `;
-            cartItemsDiv.appendChild(productDiv);
+            cartItemsContainer.appendChild(productDiv);
         });
+
         document.querySelectorAll('.product-quantity').forEach(input => {
             input.addEventListener('change', updateCart);
         });
@@ -47,9 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const quantity = parseInt(input.value);
             if (quantity > 0) {
                 const product = products.find(p => p.id === productId);
-                if (product) {
-                    cart.push({ ...product, quantity });
-                }
+                cart.push({ ...product, quantity });
             }
         });
         updateSummary();
@@ -63,38 +76,46 @@ document.addEventListener('DOMContentLoaded', () => {
             totalGoods += item.quantity;
         });
 
-        const taxes = subtotal * 0; // 0% tax
+        const taxes = 0; // 0% tax
         const discount = 0; // No discount for now
-        const total = subtotal + taxes - discount;
+
+        const totalAmount = subtotal + taxes - discount;
 
         subtotalAmountSpan.textContent = `₦${subtotal.toLocaleString()}`;
         taxesAmountSpan.textContent = `₦${taxes.toLocaleString()}`;
         discountAmountSpan.textContent = `₦${discount.toLocaleString()}`;
-        totalAmountSpan.textContent = `₦${total.toLocaleString()}`;
+        totalAmountSpan.textContent = `₦${totalAmount.toLocaleString()}`;
         totalGoodsSpan.textContent = totalGoods;
     }
 
-    function generateTicketID() {
-        return 'TICKET-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    function generateTicketId() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < 10; i++) {
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return result;
     }
 
     submitInvoiceBtn.addEventListener('click', () => {
-        const issueDate = document.getElementById('issueDate').value;
-        const dueDate = document.getElementById('dueDate').value;
-        const buyerName = document.getElementById('buyerName').value;
-        const buyerAddress = document.getElementById('buyerAddress').value;
-        const buyerContact = document.getElementById('buyerContact').value;
-        const sellerInfo = document.getElementById('sellerInfo').value;
-        const invoiceHeader = document.getElementById('invoiceHeader').value;
-
-        if (!issueDate || !dueDate || !buyerName || !buyerAddress || !buyerContact || cart.length === 0) {
-            alert('Please fill in all buyer details, select products, and ensure issue/due dates are set.');
+        if (!invoiceForm.checkValidity()) {
+            invoiceForm.reportValidity();
+            return;
+        }
+        if (cart.length === 0) {
+            alert('Please select at least one product.');
             return;
         }
 
-        const ticketID = generateTicketID();
+        const buyerName = document.getElementById('buyerName').value;
+        const buyerAddress = document.getElementById('buyerAddress').value;
+        const buyerContact = document.getElementById('buyerContact').value;
+        const issueDate = issueDateInput.value;
+        const dueDate = dueDateInput.value;
+        const sellerInfo = document.getElementById('sellerInfo').value.replace(/\n/g, '<br>');
+        const ticketId = generateTicketId();
 
-        let invoiceItemsHtml = cart.map(item => `
+        let itemsTableHtml = cart.map(item => `
             <tr>
                 <td>${item.name}</td>
                 <td>${item.quantity}</td>
@@ -103,71 +124,78 @@ document.addEventListener('DOMContentLoaded', () => {
             </tr>
         `).join('');
 
-        const subtotal = parseFloat(subtotalAmountSpan.textContent.replace('₦', '').replace(/,/g, ''));
-        const taxes = parseFloat(taxesAmountSpan.textContent.replace('₦', '').replace(/,/g, ''));
-        const discount = parseFloat(discountAmountSpan.textContent.replace('₦', '').replace(/,/g, ''));
-        const total = parseFloat(totalAmountSpan.textContent.replace('₦', '').replace(/,/g, ''));
-
         const invoiceHtml = `
-            <div class="invoice-paper">
-                <div class="invoice-header-paper">
-                    <h1 style="color: #4CAF50;">${invoiceHeader}</h1>
-                    <p><strong>Ticket ID:</strong> ${ticketID}</p>
+            <div class="invoice-paper" style="width: 210mm; min-height: 297mm; padding: 20mm; box-sizing: border-box; font-family: 'Arial', sans-serif; font-size: 10pt; background: url('https://i.imgur.com/your-canva-background-image.jpg') no-repeat center center; background-size: cover; color: #333; position: relative;">
+                <div style="text-align: center; margin-bottom: 20mm;">
+                    <h1 style="color: #007bff; margin-bottom: 5px;">GELADAN RESOURCES</h1>
+                    <p style="font-size: 11pt; color: #555;">INVOICE</p>
                 </div>
-                <div class="invoice-details-paper">
-                    <div class="invoice-info-section">
-                        <div>
-                            <p><strong>Invoice No:</strong> INV-${Date.now()}</p>
-                            <p><strong>Issue Date:</strong> ${issueDate}</p>
-                            <p><strong>Due Date:</strong> ${dueDate}</p>
-                        </div>
-                        <div>
-                            <p><strong>Seller:</strong></p>
-                            <pre>${sellerInfo}</pre>
-                        </div>
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15mm;">
+                    <div style="width: 48%;">
+                        <h4 style="color: #007bff; margin-bottom: 5px;">SELLER INFO:</h4>
+                        <p>${sellerInfo}</p>
                     </div>
-                    <div class="invoice-buyer-section">
-                        <p><strong>Bill To:</strong></p>
-                        <p>${buyerName}</p>
-                        <p>${buyerAddress}</p>
-                        <p>${buyerContact}</p>
+                    <div style="width: 48%; text-align: right;">
+                        <h4 style="color: #007bff; margin-bottom: 5px;">INVOICE FOR:</h4>
+                        <p><strong>Ticket ID:</strong> ${ticketId}</p>
+                        <p><strong>Issue Date:</strong> ${issueDate}</p>
+                        <p><strong>Due Date:</strong> ${dueDate}</p>
                     </div>
                 </div>
-                <h3 style="color: #4CAF50;">Items Purchased</h3>
-                <table class="invoice-items-table">
+
+                <div style="margin-bottom: 20mm;">
+                    <h4 style="color: #007bff; margin-bottom: 5px;">BILLED TO:</h4>
+                    <p><strong>Name/Business:</strong> ${buyerName}</p>
+                    <p><strong>Address:</strong> ${buyerAddress}</p>
+                    <p><strong>Contact:</strong> ${buyerContact}</p>
+                </div>
+
+                <h4 style="color: #007bff; margin-bottom: 10px;">ITEM DETAILS:</h4>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20mm;">
                     <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th>Quantity</th>
-                            <th>Unit Price</th>
-                            <th>Amount</th>
+                        <tr style="background-color: #f2f2f2;">
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Description</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Qty</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Unit Price</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Amount</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${invoiceItemsHtml}
+                        ${itemsTableHtml}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" style="border: 1px solid #ddd; padding: 8px; text-align: right; font-weight: bold;">Subtotal:</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">${subtotalAmountSpan.textContent}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="border: 1px solid #ddd; padding: 8px; text-align: right; font-weight: bold;">Taxes (0%):</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">${taxesAmountSpan.textContent}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="border: 1px solid #ddd; padding: 8px; text-align: right; font-weight: bold;">Discount:</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">${discountAmountSpan.textContent}</td>
+                        </tr>
+                        <tr style="background-color: #e6f2ff;">
+                            <td colspan="3" style="border: 1px solid #ddd; padding: 8px; text-align: right; font-weight: bold; font-size: 12pt;">TOTAL AMOUNT:</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold; font-size: 12pt;">${totalAmountSpan.textContent}</td>
+                        </tr>
+                    </tfoot>
                 </table>
-                <div class="invoice-summary-paper">
-                    <p>Subtotal: ₦${subtotal.toLocaleString()}</p>
-                    <p>Taxes (0%): ₦${taxes.toLocaleString()}</p>
-                    <p>Discount: ₦${discount.toLocaleString()}</p>
-                    <h3>Total Amount: ₦${total.toLocaleString()}</h3>
-                </div>
-                <div class="bank-details-paper">
-                    <h3>Bank Account Details</h3>
+
+                <div style="margin-bottom: 20mm;">
+                    <h4 style="color: #007bff; margin-bottom: 5px;">BANK ACCOUNT DETAILS:</h4>
                     <p><strong>BANK:</strong> UBA Bank</p>
                     <p><strong>ACCOUNT NAME:</strong> Uzoma Angela</p>
                     <p><strong>ACCOUNT NUMBER:</strong> 2090487949</p>
                     <p><strong>CURRENCY:</strong> ₦ NAIRA</p>
                 </div>
-                <div class="invoice-footer-paper">
-                    <p>Thank you for your business!</p>
+
+                <div style="text-align: center; margin-top: 30mm; border-top: 1px solid #eee; padding-top: 10mm; font-size: 9pt; color: #777;">
                     <p>Office Address: No.20 A line Ariaria, Aba, Abia State | Phone: 09068420849</p>
                     <p>Payment Terms: Net 30 days | Refund policies as per agreement.</p>
-                </div>
-                <div class="download-options">
-                    <button class="btn download-btn" data-format="png">Download as PNG</button>
-                    <button class="btn download-btn" data-format="jpg">Download as JPG</button>
+                    <p>Thank you for your business!</p>
                 </div>
             </div>
         `;
@@ -175,46 +203,50 @@ document.addEventListener('DOMContentLoaded', () => {
         invoicePaperContainer.innerHTML = invoiceHtml;
         invoicePaperContainer.style.display = 'block';
 
-        document.querySelectorAll('.download-btn').forEach(button => {
+        const downloadButtonsHtml = `
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn download-img-btn" data-format="png" style="margin-right: 10px;">Download as PNG</button>
+                <button class="btn download-img-btn" data-format="jpeg">Download as JPEG</button>
+            </div>
+        `;
+        invoicePaperContainer.insertAdjacentHTML('beforeend', downloadButtonsHtml);
+
+        document.querySelectorAll('.download-img-btn').forEach(button => {
             button.addEventListener('click', (event) => {
                 const format = event.target.dataset.format;
                 downloadInvoiceAsImage(format);
             });
         });
 
-        alert(`Invoice created successfully! Your Ticket ID is: ${ticketID}`);
-        // Consider clearing the form or resetting cart after submission
+        // Scroll to the generated invoice
+        invoicePaperContainer.scrollIntoView({ behavior: 'smooth' });
     });
 
-    async function downloadInvoiceAsImage(format = 'png') {
-        const invoicePaper = document.querySelector('.invoice-paper');
-        if (!invoicePaper) {
-            alert('No invoice to download.');
+    function downloadInvoiceAsImage(format = 'png') {
+        const invoiceElement = invoicePaperContainer.querySelector('.invoice-paper');
+        if (!invoiceElement) {
+            alert('No invoice to download!');
             return;
         }
 
-        const options = {
-            scale: 2, // Increase scale for better quality
-            useCORS: true, // If any images are loaded from external sources
-        };
-
-        try {
-            const canvas = await html2canvas(invoicePaper, options);
-            const image = canvas.toDataURL(`image/${format}`);
-
+        html2canvas(invoiceElement, {
+            scale: 2, // Increase scale for better resolution
+            useCORS: true, // Important if using external images in Canva background
+            logging: true,
+        }).then(canvas => {
             const link = document.createElement('a');
-            link.href = image;
-            link.download = `invoice-${Date.now()}.${format}`;
+            link.download = `Geladan_Resources_Invoice_${generateTicketId()}.${format}`;
+            link.href = canvas.toDataURL(`image/${format}`, 0.9); // 0.9 for JPEG quality
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            alert(`Invoice downloaded as .${format} successfully!`);
-        } catch (error) {
+            alert(`Invoice downloaded as ${format.toUpperCase()}!`);
+        }).catch(error => {
             console.error('Error generating image:', error);
             alert('Failed to generate image. Please try again.');
-        }
+        });
     }
 
     renderProducts();
-    updateSummary(); // Initialize summary
+    updateSummary(); // Initial summary calculation
 });
